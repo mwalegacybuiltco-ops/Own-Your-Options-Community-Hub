@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#09080d">
+  <title>Own Your Options Collective</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Italiana&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260615-0555">
+</head>
+<body class="guest-view">
+  <aside class="sidebar">
+    <a class="brand" href="#" data-page="home">
+      <span class="brand-mark"><b>O</b><i>Y</i><b>O</b></span>
+      <span><strong>OWN YOUR OPTIONS</strong><small>THE COLLECTIVE</small></span>
+    </a>
+
+    <nav class="main-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-page="home"><span>⌂</span> Home</button>
+      <button class="nav-item" data-page="apps"><span>◆</span> My Apps</button>
+      <button class="nav-item" data-page="community"><span>◌</span> Community <b>4</b></button>
+      <button class="nav-item" data-page="learn"><span>▣</span> Learn</button>
+      <button class="nav-item" data-page="start"><span>↗</span> Start Here</button>
+      <button class="nav-item" data-page="events"><span>□</span> Live Events</button>
+      <button class="nav-item paid" data-page="coaching"><span>◇</span> Coaching Hub <em>PRO</em></button>
+      <button class="nav-item" data-page="challenges"><span>♧</span> Challenges</button>
+      <button class="nav-item" data-page="resources"><span>≡</span> Resource Vault</button>
+      <button class="nav-item" data-page="members"><span>♙</span> Members</button>
+      <button class="nav-item moderator-nav" data-page="moderator" hidden><span>♢</span> Moderator Tools</button>
+      <button class="nav-item admin-nav" data-page="admin" hidden><span>⚙</span> April Admin <em>OWNER</em></button>
+    </nav>
+
+    <div class="sidebar-progress">
+      <div><span>Your weekly progress</span><strong>68%</strong></div>
+      <div class="progress"><i style="width:68%"></i></div>
+      <small>3 of 5 choices complete</small>
+    </div>
+
+    <div class="profile-mini">
+      <div class="avatar avatar-ap" id="sidebarAvatar">YO</div>
+      <div><strong id="sidebarMemberName">Your account</strong><small id="sidebarMemberRole">Own Your Options member</small></div>
+      <button aria-label="Profile options">•••</button>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <button class="mobile-menu" aria-label="Open menu">☰</button>
+      <div class="search"><span>⌕</span><input placeholder="Search the collective..."><kbd>⌘ K</kbd></div>
+      <div class="top-actions">
+        <small class="build-label">BUILD 0555</small>
+        <button class="icon-button" aria-label="Messages">◇<i></i></button>
+        <button class="icon-button" aria-label="Notifications">♧<i></i></button>
+        <button class="account-button" id="accountButton">Sign in</button>
+        <button class="new-post-button" id="openComposer">+ New post</button>
+      </div>
+    </header>
+
+    <div id="pageContent">
+      <section class="public-landing">
+        <div class="landing-copy">
+          <span class="eyebrow">Own Your Options Collective</span>
+          <h1>Create more options.<br><em>Live by choice.</em></h1>
+          <p>A supportive community, practical training, live coaching, challenges, and resources designed to help you build confidence, income, freedom, and fulfillment.</p>
+          <div class="landing-actions"><button class="primary">Member sign in</button><button class="landing-secondary">Join the Collective</button></div>
+          <div class="landing-points"><span>Community support</span><span>Practical learning</span><span>Weekly momentum</span></div>
+        </div>
+        <div class="landing-panel card"><span class="eyebrow">Inside the Collective</span><h2>Your next option starts here.</h2><p>The app is loading your secure member experience.</p></div>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="composer">
+    <form method="dialog" class="composer-card" id="postForm">
+      <div class="dialog-head">
+        <div><span class="eyebrow">Share with the community</span><h2>Create a post</h2></div>
+        <button value="cancel" aria-label="Close">×</button>
+      </div>
+      <label>Post in
+        <select id="postSpace">
+          <option>Wins & Celebrations</option>
+          <option>Introduce Yourself</option>
+          <option>Creating More Income Options</option>
+          <option>Social Media & Content</option>
+          <option>AI & Productivity</option>
+          <option>Personal Growth</option>
+          <option>Accountability Corner</option>
+          <option>Ask April</option>
+        </select>
+      </label>
+      <textarea id="postText" required placeholder="What would you like to share?"></textarea>
+      <div id="imagePreview" class="image-preview"></div>
+      <div class="composer-tools">
+        <label class="attach">▧ Add picture<input id="postImage" type="file" accept="image/*"></label>
+        <button class="primary" value="default" type="submit">Share post</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="accountDialog">
+    <div class="composer-card account-card">
+      <div class="dialog-head"><div><span class="eyebrow">Own Your Options</span><h2 id="accountTitle">Member sign in</h2></div><button id="closeAccount" aria-label="Close">×</button></div>
+      <div id="accountContent"></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+
+  <template id="commentTemplate">
+    <div class="comment"><div class="avatar avatar-ap">YO</div><div><strong>Own Your Options Member</strong><p></p></div></div>
+  </template>
+
+  <script src="cloud.js?v=20260615-0555"></script>
+  <script src="app.js?v=20260615-0555"></script>
+</body>
+</html>
