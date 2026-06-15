@@ -11,22 +11,17 @@ const offlineCloud = {
 };
 const {getSession,signOut,signIn,signUp,getHubAccessRole,fetchHubContent,fetchProfiles,fetchMemberships,fetchStaffRoles,fetchProgress,fetchPosts,fetchComments,createPost,createCloudComment,removeCloudPost,removeCloudComment,upsertHubContent,removeHubContent,upsertProgress,updateProfile,updateMembership,setMemberAccess,permanentlyDeleteMember,assignModerator}=globalThis.OYOCloud||offlineCloud;
 const readStored=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||"null")||fallback}catch{return fallback}};
-let accessRole = location.protocol === "file:" ? "Owner" : getSession() ? "Member" : "Guest";
+let accessRole = getSession() ? "Member" : "Guest";
 const spaces = ["All activity", "Introduce Yourself", "Wins & Celebrations", "Creating More Income Options", "Social Media & Content", "AI & Productivity", "Personal Growth", "Accountability Corner", "Ask April"];
 const categories = [
-  ["Responsibility", "Own your choices and create momentum.", "6 lessons", "✓"],
-  ["Resourcefulness", "Turn what you already have into options.", "8 lessons", "↗"],
-  ["Communication", "Connect clearly and confidently.", "5 lessons", "“”"],
-  ["Social Media", "Show up online with purpose.", "12 lessons", "#"],
-  ["AI Tools", "Use AI to save time and create more.", "9 lessons", "✦"],
-  ["Business Skills", "Build foundations that support growth.", "10 lessons", "▥"],
-  ["Leadership", "Lead yourself and others well.", "7 lessons", "♧"],
-  ["Creating Options Framework", "April's signature step-by-step framework.", "11 lessons", "◇"]
-];
-const defaultPosts = [
-  {name:"Nina Foster", initials:"NF", avatar:"avatar-nina", space:"Wins & Celebrations", time:"28 min ago", text:"A small win that feels very big: I sent my first proposal today. I almost talked myself out of it, then remembered that confidence comes after the action.", likes:18, comments:[["Samantha Lee","This is huge, Nina. Cheering you on!"]]},
-  {name:"April", initials:"A", avatar:"avatar-april", space:"Ask April", time:"2 hrs ago", text:"Monday reminder: you do not need the whole plan. You need one honest next move. What is yours this week?", likes:31, comments:[["Jay Williams","Mine is finally publishing the landing page."]]},
-  {name:"Samantha Lee", initials:"SL", avatar:"avatar-sam", space:"AI & Productivity", time:"Yesterday", text:"I used the weekly planning prompt from the Resource Vault and saved at least an hour. Sharing the win because simple systems really do add up.", likes:24, comments:[]}
+  ["Responsibility", "Own your choices and create momentum.", "Learning category", "✓"],
+  ["Resourcefulness", "Turn what you already have into options.", "Learning category", "↗"],
+  ["Communication", "Connect clearly and confidently.", "Learning category", "“”"],
+  ["Social Media", "Show up online with purpose.", "Learning category", "#"],
+  ["AI Tools", "Use AI to save time and create more.", "Learning category", "✦"],
+  ["Business Skills", "Build foundations that support growth.", "Learning category", "▥"],
+  ["Leadership", "Lead yourself and others well.", "Learning category", "♧"],
+  ["Creating Options Framework", "April's signature step-by-step framework.", "Learning category", "◇"]
 ];
 let userPosts = readStored("oyo-community-posts",[]);
 let currentSpace = "All activity";
@@ -44,20 +39,21 @@ function currentMemberIdentity(){
 
 function homePage() {
   const member=currentMemberIdentity();
+  const featured=managedContent.filter(item=>item.status==="Published").slice(0,3);
   return `
     <div class="page-head"><div><span class="eyebrow">Welcome to Own Your Options</span><h1>Good morning, ${escapeHtml(member.name)}.</h1><p>Keep creating confidence, income, freedom, and fulfillment.</p></div><button class="text-button" data-page="start">View your pathway →</button></div>
     <div class="home-grid"><div>
-      <section class="welcome card"><div class="welcome-copy"><span class="eyebrow">A message from April</span><h1>Own your <em>options.</em></h1><p>You have the power. You have the choices. You can create more options.</p></div><div class="play-wrap"><button class="play">▶</button><small>Watch April's welcome · 2:14</small></div></section>
-      <section class="section"><div class="section-head"><h2>This week's challenge</h2><button class="text-button" data-page="challenges">View challenge →</button></div>
-        <div class="challenge card"><div class="challenge-icon">↗</div><div><h3>Make One New Option</h3><p>Take one small action that creates a future possibility.</p><div class="progress"><i style="width:60%"></i></div></div><div class="challenge-meta"><strong>3 / 5</strong>steps complete</div></div>
+      <section class="welcome card"><div class="welcome-copy"><span class="eyebrow">A message from April</span><h1>Own your <em>options.</em></h1><p>You have the power. You have the choices. You can create more options.</p></div><div class="play-wrap"><button class="play">▶</button><small>Welcome video coming soon</small></div></section>
+      <section class="section"><div class="section-head"><h2>This week's challenge</h2><button class="text-button" data-page="challenges">View challenges →</button></div>
+        <div class="empty card">No weekly challenge has been published yet.</div>
       </section>
       <section class="section"><div class="section-head"><h2>Featured training</h2><button class="text-button" data-page="learn">Browse all training →</button></div>
-        <div class="training-grid">${categories.slice(1,4).map((c,i)=>`<article class="training-card card"><div class="training-art ${["green","orange","gold"][i]}">${c[3]}</div><div class="body"><h3>${c[0]}: ${["Creating Choices Before You Need Them","Tell Your Story With Confidence","Build a Simple Content Rhythm"][i]}</h3><small>▶ ${[12,18,9][i]} min · ${c[2]}</small></div></article>`).join("")}</div>
+        ${featured.length?`<div class="training-grid">${featured.map(item=>`<article class="training-card card"><div class="training-art green">◆</div><div class="body"><h3>${escapeHtml(item.title)}</h3><small>${escapeHtml(item.area)} · ${escapeHtml(item.type)}</small></div></article>`).join("")}</div>`:`<div class="empty card">Featured training will appear here after April publishes it.</div>`}
       </section>
     </div><aside class="side-column">
-      <section class="event-card card"><div class="event-top"><span class="eyebrow">Up next · Tuesday</span><h2>Ask April: Live Q&A</h2><p>Bring your questions, ideas, and stuck points.</p></div><div class="event-details"><div class="detail-row"><span>□</span> June 16 · 12:00 PM MT</div><div class="detail-row"><span>♙</span> 24 members attending</div><button class="primary" data-page="events">Save my spot</button></div></section>
-      <section class="wins card"><div class="section-head"><h3>Member wins</h3><button class="text-button" data-page="community">See all</button></div><div class="win"><div class="avatar avatar-nina">NF</div><div><strong>Nina launched her first offer</strong><p>"I stopped waiting for perfect."</p><small>28 min ago · ♡ 18</small></div></div><div class="win"><div class="avatar avatar-jay">JW</div><div><strong>Jay booked a new client</strong><p>"The communication training worked."</p><small>Yesterday · ♡ 31</small></div></div></section>
-      <section class="joined card"><div><strong>12 new members</strong><small>joined this week</small></div><div class="member-stack"><div class="avatar avatar-sam">SL</div><div class="avatar avatar-jay">JW</div><div class="avatar avatar-nina">NF</div></div></section>
+      <section class="event-card card"><div class="event-top"><span class="eyebrow">Live Events</span><h2>Upcoming sessions</h2><p>New live trainings and workshops will appear here after April publishes them.</p></div><div class="event-details"><button class="primary" data-page="events">View live events</button></div></section>
+      <section class="wins card"><div class="section-head"><h3>Member wins</h3><button class="text-button" data-page="community">See community</button></div><div class="empty">Real member celebrations will appear here.</div></section>
+      <section class="joined card"><div><strong>${managedMembers.filter(x=>x.accessStatus==="Active").length} members</strong><small>in the Collective</small></div></section>
     </aside></div>`;
 }
 
@@ -72,11 +68,11 @@ function postCard(post, idx) {
 
 function communityPage() {
   const member=currentMemberIdentity();
-  const all = [...userPosts, ...defaultPosts].filter(p => currentSpace === "All activity" || p.space === currentSpace);
+  const all = userPosts.filter(p => currentSpace === "All activity" || p.space === currentSpace);
   return `<div class="page-head"><div><span class="eyebrow">The Own Your Options Collective</span><h1>Community</h1><p>Connect with people creating options, taking responsibility, and building freedom.</p></div></div>
   <div class="page-layout"><aside class="spaces card"><h3>Spaces</h3>${spaces.map(s=>`<button class="space-button ${s===currentSpace?"active":""}" data-space="${s}">${s}</button>`).join("")}</aside>
   <section class="feed"><div class="quick-post card"><div class="avatar avatar-ap">${member.initials}</div><button id="quickPost">Share a win, question, or idea...</button></div>${all.length ? all.map(postCard).join("") : `<div class="empty card">No posts here yet. Start the conversation.</div>`}</section>
-  <aside class="community-aside card"><div class="prompt-box card"><span>WEEKLY PROMPT</span><p>What is one thing you know now that you wish you knew a year ago?</p></div><h3 style="margin-top:18px">Online now</h3><div class="online-list">${[["April","A","avatar-april"],["Samantha Lee","SL","avatar-sam"],["Jay Williams","JW","avatar-jay"],["Nina Foster","NF","avatar-nina"]].map(x=>`<div class="online"><div class="avatar ${x[2]}">${x[1]}</div>${x[0]}<i></i></div>`).join("")}</div></aside></div>`;
+  <aside class="community-aside card"><div class="prompt-box card"><span>COMMUNITY</span><p>Use the spaces to introduce yourself, ask questions, share wins, and connect.</p></div><h3 style="margin-top:18px">Members</h3><div class="empty">Real directory members will appear as they join.</div></aside></div>`;
 }
 
 function learnPage() {
@@ -88,8 +84,7 @@ function startPage() {
 }
 
 function eventsPage() {
-  const events = [["16","JUN","Ask April: Live Q&A","Tuesday · 12:00 PM MT · Weekly live training"],["24","JUN","Build Your Options Map","Wednesday · 6:00 PM MT · Monthly workshop"],["02","JUL","Guest Expert: Simple Sales","Thursday · 12:00 PM MT · Guest session"],["07","JUL","Community Co-working Hour","Tuesday · 10:00 AM MT · Accountability session"]];
-  return `<div class="page-head"><div><span class="eyebrow">Learn live, together</span><h1>Live Events</h1><p>Trainings, workshops, guest experts, and real-time support.</p></div><button class="primary">Add all to calendar</button></div><div class="event-list">${events.map(e=>`<article class="event-row card"><div class="date-box"><strong>${e[0]}</strong><small>${e[1]}</small></div><div><h3>${e[2]}</h3><p>${e[3]}</p></div><button class="primary rsvp">Save my spot</button></article>`).join("")}</div>`;
+  return `<div class="page-head"><div><span class="eyebrow">Learn live, together</span><h1>Live Events</h1><p>Trainings, workshops, guest experts, and real-time support.</p></div></div><div class="empty card">No live events have been published yet.</div>`;
 }
 
 function coachingPage() {
@@ -97,37 +92,27 @@ function coachingPage() {
 }
 
 function challengesPage() {
-  const items=[["7","7 Day Resourcefulness Challenge","Find new possibilities in what you already have."],["30","30 Day Options Challenge","Create meaningful choices for your future."],["#","Content Challenge","Build a simple, sustainable sharing rhythm."],["↑","Confidence Challenge","Build confidence through small brave actions."]];
-  return `<div class="page-head"><div><span class="eyebrow">Small actions, real momentum</span><h1>Challenges</h1><p>Choose a guided challenge and do it alongside the community.</p></div></div><div class="challenge-grid">${items.map((x,i)=>`<article class="challenge-card card"><div class="challenge-banner">${x[0]}</div><div class="body"><span class="eyebrow">${i===0?"Popular now":"Start anytime"}</span><h3 style="margin-top:7px">${x[1]}</h3><p>${x[2]}</p><button class="primary">Join challenge</button></div></article>`).join("")}</div>`;
+  return `<div class="page-head"><div><span class="eyebrow">Small actions, real momentum</span><h1>Challenges</h1><p>Choose a guided challenge and do it alongside the community.</p></div></div><div class="empty card">No challenges have been published yet.</div>`;
 }
 
 function resourcesPage() {
-  const items=[["PDF","My Options Map","A one-page worksheet for seeing your possibilities."],["AI","Weekly Planning Prompt","Turn your priorities into a practical weekly plan."],["DOC","Simple Offer Builder","Shape your skills into a clear, useful offer."],["PDF","Confidence Checklist","A grounded reset before a brave action."],["LINK","Content Idea Bank","50 useful prompts for showing up online."],["PDF","Conversation Planner","Prepare for clear, confident conversations."]];
-  return `<div class="page-head"><div><span class="eyebrow">Tools you can use today</span><h1>Resource Vault</h1><p>Templates, prompts, PDFs, checklists, and trusted links.</p></div></div><div class="resource-filter">${["All resources","Templates","AI prompts","Checklists","Links"].map((x,i)=>`<button class="pill ${i===0?"active":""}">${x}</button>`).join("")}</div><div class="resource-grid">${items.map(x=>`<article class="resource-card card"><div class="file-type">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]}</p><small>Open resource →</small></article>`).join("")}</div>`;
+  return `<div class="page-head"><div><span class="eyebrow">Tools you can use today</span><h1>Resource Vault</h1><p>Templates, prompts, PDFs, checklists, and trusted links.</p></div></div><div class="empty card">No resources have been published yet.</div>`;
 }
 
 function membersPage() {
   const people=managedMembers.filter(member=>member.visible && member.accessStatus==="Active");
-  return `<div class="page-head"><div><span class="eyebrow">Find your people</span><h1>Member Directory</h1><p>Connect through location, skills, business interests, and goals.</p></div><button class="primary">Edit my profile</button></div><div class="resource-filter">${["All members","Near me","Shared goals","Shared interests"].map((x,i)=>`<button class="pill ${i===0?"active":""}">${x}</button>`).join("")}</div><div class="members-grid">${people.map(member=>`<article class="member-card card"><div class="avatar ${member.avatar}">${initials(member.name)}</div><h3>${escapeHtml(member.name)}</h3><p>⌖ ${escapeHtml(member.location)}</p><p>${escapeHtml(member.bio||"Creating more options.")}</p><div class="tags">${member.interests.split(",").map(t=>`<span class="tag">${escapeHtml(t.trim())}</span>`).join("")}</div></article>`).join("")}</div>`;
+  return `<div class="page-head"><div><span class="eyebrow">Find your people</span><h1>Member Directory</h1><p>Connect through location, skills, business interests, and goals.</p></div><button class="primary">Edit my profile</button></div><div class="resource-filter">${["All members","Near me","Shared goals","Shared interests"].map((x,i)=>`<button class="pill ${i===0?"active":""}">${x}</button>`).join("")}</div>${people.length?`<div class="members-grid">${people.map(member=>`<article class="member-card card"><div class="avatar ${member.avatar}">${initials(member.name)}</div><h3>${escapeHtml(member.name)}</h3><p>⌖ ${escapeHtml(member.location)}</p><p>${escapeHtml(member.bio||"Creating more options.")}</p><div class="tags">${member.interests.split(",").map(t=>`<span class="tag">${escapeHtml(t.trim())}</span>`).join("")}</div></article>`).join("")}</div>`:`<div class="empty card">Real members will appear here after they join and choose to be visible.</div>`}`;
 }
 
-const starterMembers=[
-  {id:1,name:"April Lungal",email:"april@ownyouroptions.com",location:"Alberta",interests:"Leadership, Business",goals:"Grow the Collective",bio:"Coach, mentor, and founder of Own Your Options.",status:"Active",visible:true,plan:"Owner",role:"Owner",progress:100,lastActive:"Today",avatar:"avatar-april"},
-  {id:2,name:"Nina Foster",email:"nina@example.com",location:"Ontario",interests:"New business, Confidence",goals:"Launch first offer",bio:"Creating a new income option.",status:"Active",visible:true,plan:"Collective",progress:68,lastActive:"Today",avatar:"avatar-nina"},
-  {id:3,name:"Jay Williams",email:"jay@example.com",location:"Colorado",interests:"Sales, Communication",goals:"Find three clients",bio:"Building a service business.",status:"Active",visible:true,plan:"Coaching",progress:82,lastActive:"Yesterday",avatar:"avatar-jay"},
-  {id:4,name:"Samantha Lee",email:"sam@example.com",location:"British Columbia",interests:"AI, Productivity",goals:"Create more time",bio:"Using better systems to build freedom.",status:"Active",visible:true,plan:"Collective",progress:54,lastActive:"Today",avatar:"avatar-sam"},
-  {id:5,name:"Morgan Reed",email:"morgan@example.com",location:"Texas",interests:"Content, Coaching",goals:"Grow an audience",bio:"Sharing useful ideas consistently.",status:"Active",visible:true,plan:"Collective",progress:36,lastActive:"3 days ago",avatar:"avatar-ap"},
-  {id:6,name:"Taylor Khan",email:"taylor@example.com",location:"Nova Scotia",interests:"Starting over, Leadership",goals:"Choose a new direction",bio:"Designing the next chapter.",status:"Paused",visible:false,plan:"Collective",progress:22,lastActive:"2 weeks ago",avatar:"avatar-nina"}
-];
-const starterContent=[
-  {id:101,title:"Responsibility Creates Options",area:"Learn",type:"Lesson",status:"Published",description:"See where your power lives and choose one useful action."},
-  {id:102,title:"My Options Map",area:"Resource Vault",type:"PDF",status:"Published",description:"A one-page worksheet for seeing your possibilities."},
-  {id:103,title:"Ask April: Live Q&A",area:"Live Events",type:"Live session",status:"Published",description:"Bring your questions, ideas, and stuck points."},
-  {id:104,title:"7 Day Resourcefulness Challenge",area:"Challenges",type:"Challenge",status:"Published",description:"Use what you already have to create momentum."},
-  {id:105,title:"Overcoming Overwhelm",area:"Coaching Hub",type:"Replay",status:"Draft",description:"Turn an overloaded mind into one clear decision."}
-];
+const starterMembers=[];
+const starterContent=[];
 let managedMembers=readStored("oyo-hub-members",starterMembers);
 let managedContent=readStored("oyo-hub-content",starterContent);
+const demoNames=new Set(["Nina Foster","Jay Williams","Samantha Lee","Morgan Reed","Taylor Khan"]);
+managedMembers=managedMembers.filter(member=>!demoNames.has(member.name)&&!String(member.email||"").endsWith("@example.com"));
+userPosts=userPosts.filter(post=>!demoNames.has(post.name));
+const demoContentTitles=new Set(["Responsibility Creates Options","My Options Map","Ask April: Live Q&A","7 Day Resourcefulness Challenge","Overcoming Overwhelm"]);
+managedContent=managedContent.filter(item=>!demoContentTitles.has(item.title));
 managedMembers.forEach(member=>member.completions??={});
 managedMembers.forEach(member=>member.role??="Member");
 managedMembers.forEach(member=>{member.accessStatus??=member.status==="Paused"?"Suspended":"Active";member.internalNotes??="";member.statusReason??="";member.archivedAt??="";});
@@ -135,6 +120,7 @@ managedMembers.forEach(member=>{if(member.email==="april@ownyouroptions.com"||me
 let adminTab="overview";
 const saveMembers=()=>localStorage.setItem("oyo-hub-members",JSON.stringify(managedMembers));
 const saveContent=()=>localStorage.setItem("oyo-hub-content",JSON.stringify(managedContent));
+saveMembers();saveContent();localStorage.setItem("oyo-community-posts",JSON.stringify(userPosts));
 const initials=name=>name.split(/\s+/).map(part=>part[0]).join("").slice(0,2).toUpperCase();
 const sameId=(a,b)=>String(a)===String(b);
 let cloudReady=false;
@@ -162,7 +148,7 @@ function adminPage(){
 }
 function adminPanelMarkup(){
   if(adminTab==="overview"){
-    const active=managedMembers.filter(x=>x.accessStatus==="Active").length, avg=Math.round(managedMembers.reduce((a,x)=>a+x.progress,0)/managedMembers.length);
+    const active=managedMembers.filter(x=>x.accessStatus==="Active").length, avg=managedMembers.length?Math.round(managedMembers.reduce((a,x)=>a+x.progress,0)/managedMembers.length):0;
     return `<div class="admin-metrics">${[["Members",managedMembers.length,"Total member records"],["Active",active,"Able to access the hub"],["Average progress",avg+"%","Across all members"],["Published",managedContent.filter(x=>x.status==="Published").length,"Visible content items"]].map(x=>`<article class="metric-card card"><span class="eyebrow">${x[0]}</span><strong>${x[1]}</strong><p>${x[2]}</p></article>`).join("")}</div>
     <div class="admin-two"><section class="admin-box card"><h2>What you can manage</h2><div class="admin-checklist">${["Add, edit, publish, draft, or remove content","Control which members appear in the directory","Review each member's completion and last activity","Activate, pause, or remove member accounts","Assign moderators with limited permissions","Moderate posts shared in the community"].map(x=>`<p>✓ ${x}</p>`).join("")}</div></section><section class="admin-box card"><span class="eyebrow">Needs attention</span><h2>Member follow-up</h2>${managedMembers.filter(x=>x.progress<50).map(x=>`<div class="attention-row"><div class="avatar ${x.avatar}">${initials(x.name)}</div><div><strong>${x.name}</strong><small>${x.progress}% complete · ${x.lastActive}</small></div></div>`).join("")}</section></div>`;
   }
@@ -196,8 +182,9 @@ const pages = {home:homePage, apps:appsPage, community:communityPage, learn:lear
 function render(page="home") {
   document.body.classList.toggle("guest-view",accessRole==="Guest");
   if(accessRole==="Guest"){
-    pageContent.innerHTML=`<section class="public-landing"><div class="landing-copy"><span class="eyebrow">Own Your Options Collective</span><h1>Create more options.<br><em>Live by choice.</em></h1><p>A supportive community, practical training, live coaching, challenges, and resources designed to help you build confidence, income, freedom, and fulfillment.</p><div class="landing-actions"><button class="primary" id="gatewaySignIn">Member sign in</button><button class="landing-secondary" id="gatewayJoin">Join the Collective</button></div><div class="landing-points"><span>Community support</span><span>Practical learning</span><span>Weekly momentum</span></div></div><div class="landing-panel card"><span class="eyebrow">Inside the Collective</span><h2>Your next option starts here.</h2><div class="landing-feature"><b>01</b><div><strong>Find your pathway</strong><small>Start with what matters most right now.</small></div></div><div class="landing-feature"><b>02</b><div><strong>Learn useful skills</strong><small>Build business, confidence, AI, and communication skills.</small></div></div><div class="landing-feature"><b>03</b><div><strong>Take action together</strong><small>Join challenges, live sessions, and community conversations.</small></div></div></div></section>`;
-    document.querySelectorAll("#gatewaySignIn,#gatewayJoin").forEach(button=>button.addEventListener("click",openAccount));
+    pageContent.innerHTML=`<section class="public-landing"><div class="landing-copy"><span class="eyebrow">Own Your Options Collective</span><h1>Create more options.<br><em>Live by choice.</em></h1><p>A supportive community, practical training, live coaching, challenges, and resources designed to help you build confidence, income, freedom, and fulfillment.</p><div class="landing-points"><span>Community support</span><span>Practical learning</span><span>Weekly momentum</span></div></div><div class="landing-login card"><span class="eyebrow">Member access</span><h2>Welcome back.</h2><p>Sign in to enter the Own Your Options Collective.</p><form class="landing-login-form" id="landingSignInForm"><label>Email<input id="landingEmail" type="email" autocomplete="email" required placeholder="Your email address"></label><label>Password<input id="landingPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="Your password"></label><div id="landingAuthMessage"></div><button class="primary wide">Member sign in</button></form><div class="landing-join"><span>New to the Collective?</span><button id="gatewayJoin">Create a member account</button></div></div></section>`;
+    document.querySelector("#landingSignInForm").addEventListener("submit",async event=>{event.preventDefault();const message=document.querySelector("#landingAuthMessage");message.textContent="Signing you in...";try{await signIn(document.querySelector("#landingEmail").value,document.querySelector("#landingPassword").value);location.reload()}catch(error){message.textContent=error.message}});
+    document.querySelector("#gatewayJoin").addEventListener("click",openAccount);
     return;
   }
   if(accessRole==="Blocked"){
@@ -314,7 +301,7 @@ document.querySelector("#postForm")?.addEventListener("submit",async e=>{e.preve
 render();
 
 async function initializeCloud(){
-  if(location.protocol==="file:"||!getSession())return;
+  if(!getSession())return;
   try{
     accessRole=await getHubAccessRole();
     updateIdentityUI();

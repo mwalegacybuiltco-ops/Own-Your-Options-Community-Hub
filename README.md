@@ -48,4 +48,4 @@ After signing in as April:
 - Moderator roles
 - Member progress, blocking, archiving, and deletion controls
 
-The expected version label is **BUILD 0555**.
+The expected version label is **BUILD 0700**.
